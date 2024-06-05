@@ -1,4 +1,5 @@
 ﻿using System.IO.Abstractions;
+using AStar.ImagesAPI.Services;
 using AStar.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,7 @@ public static class Services
 
         _ = services.AddScoped(_ => new FilesContext(contextOptions));
         _ = services.AddSingleton<IFileSystem, FileSystem>();
+        _ = services.AddSingleton<IImageService, ImageService>();
 
         var sp = services.BuildServiceProvider();
         var context = sp.GetRequiredService<FilesContext>();

@@ -10,13 +10,6 @@
       {
         "Name": "Seq",
         "Args": { "serverUrl": "http://localhost:5341" }
-      },
-      {
-        "Name": "ApplicationInsights",
-        "Args": {
-          "connectionString": "[your connection string here]",
-          "telemetryConverter": "Serilog.Sinks.ApplicationInsights.Sinks.ApplicationInsights.TelemetryConverters.TraceTelemetryConverter, Serilog.Sinks.ApplicationInsights"
-        }
       }
     ],
     "MinimumLevel": {
