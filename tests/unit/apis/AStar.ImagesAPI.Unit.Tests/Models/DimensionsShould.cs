@@ -1,6 +1,7 @@
 ﻿using AStar.ImagesAPI.Models;
 
 namespace AStar.Web.ImagesAPI.Models;
+
 public class DimensionsShould
 {
     [Fact]

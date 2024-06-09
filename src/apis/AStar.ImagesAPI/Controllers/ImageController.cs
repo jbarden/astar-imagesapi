@@ -13,7 +13,6 @@ namespace AStar.ImagesAPI.Controllers;
 
 [Route("api/image")]
 [ApiController]
-
 public class ImageController(IFileSystem fileSystem, IImageService imageService, FilesContext context, ILogger<ImageController> logger) : ControllerBase
 {
     private const int MaximumHeightAndWidthForThumbnail = 850;
@@ -32,7 +31,7 @@ public class ImageController(IFileSystem fileSystem, IImageService imageService,
     /// <returns>
     /// </returns>
     [HttpGet(Name = "Image")]
-    [Produces("application/json")]
+    [Produces("application/octet-stream")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -53,10 +52,10 @@ public class ImageController(IFileSystem fileSystem, IImageService imageService,
         var index = imagePath.LastIndexOf('\\');
         var directory = imagePath[..index];
         var filename = imagePath[(index + 1)..];
-        var fileInfoJb = ReadDb(directory, filename);
-        if(fileInfoJb is not null)
+        var fileAccessDetail = ReadDb(directory, filename);
+        if(fileAccessDetail is not null)
         {
-            fileInfoJb.LastViewed = DateTime.UtcNow;
+            fileAccessDetail.LastViewed = DateTime.UtcNow;
             try
             {
                 _ = context.SaveChanges();
@@ -165,16 +164,18 @@ public class ImageController(IFileSystem fileSystem, IImageService imageService,
             ? MaximumHeightAndWidthForThumbnail
             : maximumSizeInPixels;
 
-    private FileDetail? ReadDb(string directory, string filename)
+    private FileAccessDetail ReadDb(string directory, string filename)
     {
         try
         {
-            return context.Files.FirstOrDefault(f => f.FileName == filename && f.DirectoryName == directory);
+            var file =context.Files.Single(f => f.FileName == filename && f.DirectoryName == directory);
+            return context.FileAccessDetails.Single(f => f.Id == file.Id);
         }
         catch
         {
             _ = Task.Delay(TimeSpan.FromSeconds(2));
-            return context.Files.FirstOrDefault(f => f.FileName == filename && f.DirectoryName == directory);
+            var file =context.Files.Single(f => f.FileName == filename && f.DirectoryName == directory);
+            return context.FileAccessDetails.Single(f => f.Id == file.Id);
         }
     }
 }
