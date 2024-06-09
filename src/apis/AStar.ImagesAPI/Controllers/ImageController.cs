@@ -13,7 +13,8 @@ namespace AStar.ImagesAPI.Controllers;
 
 [Route("api/image")]
 [ApiController]
-public class ImageController(IFileSystem fileSystem, IImageService imageService, FilesContext context) : ControllerBase
+
+public class ImageController(IFileSystem fileSystem, IImageService imageService, FilesContext context, ILogger<ImageController> logger) : ControllerBase
 {
     private const int MaximumHeightAndWidthForThumbnail = 850;
 
@@ -38,6 +39,7 @@ public class ImageController(IFileSystem fileSystem, IImageService imageService,
     public ActionResult<FileStream> GetImage(string imagePath, bool thumbnail = true, int maximumSizeInPixels = 150,
         bool resize = false)
     {
+        logger.LogDebug("Starting retrieval for the {ImagePath} thumbnail: {Thumbnail}, maximumSizeInPixels: {MaximumSizeInPixels}", imagePath, thumbnail, maximumSizeInPixels);
         if(!imagePath.IsImage())
         {
             return BadRequest("Unsupported file type.");
@@ -76,6 +78,7 @@ public class ImageController(IFileSystem fileSystem, IImageService imageService,
             using var imageThumbnail = ResizeImage(imageFromFile, (int)dimensions.Width!, (int)dimensions.Height!);
             var thumbnailMemoryStream = ToMemoryStream(imageThumbnail);
 
+            logger.LogDebug("Returning the {ImagePath} thumbnail: {Thumbnail}, maximumSizeInPixels: {MaximumSizeInPixels}", imagePath, thumbnail, maximumSizeInPixels);
             return File(thumbnailMemoryStream, $"image/{extension}");
         }
 
@@ -87,11 +90,13 @@ public class ImageController(IFileSystem fileSystem, IImageService imageService,
             using var imageThumbnail = ResizeImage(imageFromFile, (int)dimensions.Width!, (int)dimensions.Height!);
             var thumbnailMemoryStream = ToMemoryStream(imageThumbnail);
 
+            logger.LogDebug("Returning the {ImagePath} thumbnail: {Thumbnail}, maximumSizeInPixels: {MaximumSizeInPixels}", imagePath, thumbnail, maximumSizeInPixels);
             return File(thumbnailMemoryStream, $"image/{extension}");
         }
 
         var imageStream = ToMemoryStream(imageFromFile);
 
+        logger.LogDebug("Returning the {ImagePath} thumbnail: {Thumbnail}, maximumSizeInPixels: {MaximumSizeInPixels}", imagePath, thumbnail, maximumSizeInPixels);
         return File(imageStream, $"image/{extension}");
     }
 
