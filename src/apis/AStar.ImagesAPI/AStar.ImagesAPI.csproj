@@ -25,11 +25,14 @@
 		<PackageReference Include="AStar.Api.HealthChecks" Version="0.3.0" />
 		<PackageReference Include="AStar.Logging.Extensions" Version="0.3.0" />
 		<PackageReference Include="AStar.ASPNet.Extensions" Version="0.6.0" />
-		<PackageReference Include="AStar.Infrastructure" Version="1.5.1" />
+		<PackageReference Include="AStar.Infrastructure" Version="1.8.2" />
+		<PackageReference Include="FastEndpoints" Version="5.26.0" />
+		<PackageReference Include="FastEndpoints.Swagger" Version="5.26.0" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.6" />
-		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.9.2" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.10.0" />
 		<PackageReference Include="System.Drawing.Common" Version="8.0.6" />
 		<PackageReference Include="System.IO.Abstractions" Version="21.0.2" />
+		<PackageReference Include="SkiaSharp" Version="2.88.8" />
 	</ItemGroup>
 
 </Project>
