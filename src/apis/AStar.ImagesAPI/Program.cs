@@ -25,7 +25,6 @@ public static class Program
             if(useFastEndpoints)
             {
                 _ = builder.Services.AddFastEndpoints();
-                //_ = builder.Services.SwaggerDocument();
                 _ = builder.Services.ConfigureApi(new OpenApiInfo() { Title = "AStar Web Images API", Version = "v1" });
             }
             else
@@ -40,11 +39,6 @@ public static class Program
             if(useFastEndpoints)
             {
                 _ = app.UseFastEndpoints();
-                //_ = app.UseSwaggerGen();
-            }
-            else
-            {
-                // ??????
             }
 
             _ = ConfigurePipeline(app);

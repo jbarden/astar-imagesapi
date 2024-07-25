@@ -1,8 +1,6 @@
 ﻿using System.Drawing;
-using System.Runtime.Versioning;
 using AStar.ImagesAPI.Models;
 using SkiaSharp;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AStar.ImagesAPI.Services;
 
@@ -15,7 +13,7 @@ public class ImageService(ILogger<ImageService> logger) : IImageService
     private const int MaximumHeightAndWidthForThumbnail = 850;
 
     /// <inheritdoc/>
-    public byte[] GetImage(string imagePath, int maxDimensions)
+    public Stream GetImage(string imagePath, int maxDimensions)
     {
         logger.LogInformation("Getting resized {ImagePath}", imagePath);
         using var imageFromFile = SKImage.FromEncodedData(imagePath);
@@ -24,7 +22,24 @@ public class ImageService(ILogger<ImageService> logger) : IImageService
         SKImage output = SKImage.Create(info);
         _ = imageFromFile.ScalePixels(output.PeekPixels(), SKFilterQuality.None);
         using var data = output.Encode(SKEncodedImageFormat.Jpeg, 50);
-        return output.Encode().ToArray();
+        return data.AsStream();
+    }
+
+    public Image GetImage2(string imagePath, int maxDimensions)
+    {
+        try
+        {
+            return Image.FromFile(imagePath);
+        }
+        catch(Exception e)
+        {
+            logger.LogError(e, "An error occurred ({Error}) whilst retrieving {FileName} - full stack: {Stack}", e.Message, imagePath, e.StackTrace);
+            var bmp = new Bitmap(100, 50);
+            var g = Graphics.FromImage(bmp);
+            g.Clear(Color.DarkRed);
+
+            return bmp;
+        }
     }
 
     private static Dimensions ImageDimensions(int width, int height, int maximumSizeInPixels)

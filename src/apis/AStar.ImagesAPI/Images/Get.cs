@@ -12,10 +12,10 @@ using SkiaSharp;
 
 namespace AStar.ImagesAPI.Images;
 
-[Route("api/image")]
+[Route("api/imageA")]
 public class Get(IFileSystem fileSystem, IImageService imageService, FilesContext context, ILogger<Get> logger) : EndpointBaseAsync
                     .WithRequest<Request>
-                    .WithActionResult<FileContentResult>
+                    .WithActionResult<Stream>
 {
     private const int MaximumHeightAndWidthForThumbnail = 850;
 
@@ -29,7 +29,7 @@ public class Get(IFileSystem fileSystem, IImageService imageService, FilesContex
         OperationId = "Image_get",
         Tags = ["Images"])
 ]
-    public override async Task<ActionResult<FileContentResult>> HandleAsync([FromQuery] Request request, CancellationToken cancellationToken = default)
+    public override async Task<ActionResult<Stream>> HandleAsync([FromQuery] Request request, CancellationToken cancellationToken = default)
     {
         var imagePath = request.ImagePath;
         logger.LogDebug("Starting retrieval for the {ImagePath} with maximum dimensions: {MaxDimensions}", imagePath, request.MaxDimensions);
@@ -44,9 +44,12 @@ public class Get(IFileSystem fileSystem, IImageService imageService, FilesContex
         }
 
         await UpdateLastViewed(imagePath.DirectoryName(), imagePath.FileName(), cancellationToken);
+        if(request.MaxDimensions > MaximumHeightAndWidthForThumbnail)
+        {
+            request.MaxDimensions = MaximumHeightAndWidthForThumbnail;
+        }
 
-        var ffff = new FileContentResult(imageService.GetImage(imagePath, request.MaxDimensions), "image/jpeg");
-        return ffff;
+        return Ok(imageService.GetImage(imagePath, request.MaxDimensions));
     }
 
     private async Task UpdateLastViewed(string directory, string filename, CancellationToken cancellationToken)

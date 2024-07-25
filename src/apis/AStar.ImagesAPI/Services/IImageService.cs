@@ -1,4 +1,5 @@
-﻿using SkiaSharp;
+﻿using System.Drawing;
+using SkiaSharp;
 
 namespace AStar.ImagesAPI.Services;
 
@@ -13,5 +14,7 @@ public interface IImageService
     /// <param name="imagePath">The full path to the image.</param>
     /// <param name="maxDimensions">The maximum dimensions that the returned image cannot exceed in either direction.</param>
     /// <returns>The image as a <see cref="Stream"/>.</returns>
-    byte[] GetImage(string imagePath, int maxDimensions);
+    Stream GetImage(string imagePath, int maxDimensions);
+
+    Image GetImage2(string imagePath, int maxDimensions);
 }
