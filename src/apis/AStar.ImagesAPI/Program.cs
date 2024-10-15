@@ -25,12 +25,9 @@ public static class Program
             if(useFastEndpoints)
             {
                 _ = builder.Services.AddFastEndpoints();
-                _ = builder.Services.ConfigureApi(new OpenApiInfo() { Title = "AStar Web Images API", Version = "v1" });
             }
-            else
-            {
-                _ = builder.Services.ConfigureApi(new OpenApiInfo() { Title = "AStar Web Images API", Version = "v1" });
-            }
+
+            _ = builder.Services.ConfigureApi(new OpenApiInfo() { Title = "AStar Web Images API", Version = "v1" }, true);
 
             Log.Information("Starting {AppName}", typeof(Program).AssemblyQualifiedName);
             _ = StartupConfiguration.Services.Configure(builder.Services, builder.Configuration);

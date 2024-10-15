@@ -8,6 +8,7 @@ using AStar.ImagesAPI.Services;
 using AStar.Infrastructure.Data;
 using AStar.Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AStar.ImagesAPI.Controllers;
 
@@ -168,12 +169,12 @@ public class ImageController(IFileSystem fileSystem, IImageService imageService,
     {
         try
         {
-            return context.Files.FirstOrDefault(f => f.FileName == filename && f.DirectoryName == directory);
+            return context.Files.Include(file => file.FileAccessDetail).FirstOrDefault(f => f.FileName == filename && f.DirectoryName == directory);
         }
         catch
         {
             _ = Task.Delay(TimeSpan.FromSeconds(2));
-            return context.Files.FirstOrDefault(f => f.FileName == filename && f.DirectoryName == directory);
+            return context.Files.Include(file => file.FileAccessDetail).FirstOrDefault(f => f.FileName == filename && f.DirectoryName == directory);
         }
     }
 }
