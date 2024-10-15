@@ -1,19 +1,31 @@
 ﻿using System.Drawing;
-using System.Runtime.Versioning;
+using AStar.ImagesAPI.Models;
+using SkiaSharp;
 
 namespace AStar.ImagesAPI.Services;
 
+/// <summary>
+///
+/// </summary>
+/// <param name="logger"></param>
 public class ImageService(ILogger<ImageService> logger) : IImageService
 {
-    /// <summary>
-    /// This feels like it should be on the files API
-    /// </summary>
-    /// <param name="imagePath">
-    /// </param>
-    /// <returns>
-    /// </returns>
-    [SupportedOSPlatform("windows")]
-    public Image GetImage(string imagePath)
+    private const int MaximumHeightAndWidthForThumbnail = 850;
+
+    /// <inheritdoc/>
+    public Stream GetImage(string imagePath, int maxDimensions)
+    {
+        logger.LogInformation("Getting resized {ImagePath}", imagePath);
+        using var imageFromFile = SKImage.FromEncodedData(imagePath);
+        var dimensions = ImageDimensions(imageFromFile.Width, imageFromFile.Height, maxDimensions);
+        SKImageInfo info = new SKImageInfo(dimensions.Width, dimensions.Height, SKColorType.Bgra8888);
+        SKImage output = SKImage.Create(info);
+        _ = imageFromFile.ScalePixels(output.PeekPixels(), SKFilterQuality.None);
+        using var data = output.Encode(SKEncodedImageFormat.Jpeg, 50);
+        return data.AsStream();
+    }
+
+    public Image GetImage2(string imagePath, int maxDimensions)
     {
         try
         {
@@ -28,5 +40,17 @@ public class ImageService(ILogger<ImageService> logger) : IImageService
 
             return bmp;
         }
+    }
+
+    private static Dimensions ImageDimensions(int width, int height, int maximumSizeInPixels)
+    {
+        var restrictedSizeInPixels = maximumSizeInPixels > MaximumHeightAndWidthForThumbnail
+                            ? MaximumHeightAndWidthForThumbnail
+                            : maximumSizeInPixels;
+        var ratio = (double)restrictedSizeInPixels / width;
+        var newWidth = (int)(width * ratio);
+        var newHeight = (int)(height * ratio);
+
+        return new() { Height = newHeight, Width = newWidth };
     }
 }

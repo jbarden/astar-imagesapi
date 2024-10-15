@@ -1,24 +1,9 @@
 ﻿using AStar.ImagesAPI.Models;
 
 namespace AStar.Web.ImagesAPI.Models;
+
 public class DimensionsShould
 {
-    [Fact]
-    public void ContainTheNullableHeightProperty()
-    {
-        var sut = new Dimensions();
-
-        _ = sut.Height.Should().BeNull();
-    }
-
-    [Fact]
-    public void ContainTheNullableWidthProperty()
-    {
-        var sut = new Dimensions();
-
-        _ = sut.Width.Should().BeNull();
-    }
-
     [Fact]
     public void SetTheHeightToSuppliedIntegerValue()
     {
@@ -37,16 +22,7 @@ public class DimensionsShould
         Action sut = () => new Dimensions { Height = mockHeight };
 
         _ = sut.Should().Throw<ArgumentOutOfRangeException>()
-            .WithMessage("Height cannot be null or negative. (Parameter 'Height')");
-    }
-
-    [Fact]
-    public void NotSetTheHeightToSuppliedNullValue()
-    {
-        Action sut = () => new Dimensions { Height = null };
-
-        _ = sut.Should().Throw<ArgumentOutOfRangeException>()
-            .WithMessage("Height cannot be null or negative. (Parameter 'Height')");
+            .WithMessage("Height cannot be negative. (Parameter 'Height')");
     }
 
     [Fact]
@@ -78,16 +54,7 @@ public class DimensionsShould
         Action sut = () => new Dimensions { Width = mockWidth };
 
         _ = sut.Should().Throw<ArgumentOutOfRangeException>()
-            .WithMessage("Width cannot be null or negative. (Parameter 'Width')");
-    }
-
-    [Fact]
-    public void NotSetTheWidthToSuppliedNullValue()
-    {
-        Action sut = () => new Dimensions { Width = null };
-
-        _ = sut.Should().Throw<ArgumentOutOfRangeException>()
-            .WithMessage("Width cannot be null or negative. (Parameter 'Width')");
+            .WithMessage("Width cannot be negative. (Parameter 'Width')");
     }
 
     [Fact]

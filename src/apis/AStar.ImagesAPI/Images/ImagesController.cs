@@ -8,12 +8,12 @@ using AStar.ImagesAPI.Services;
 using AStar.Infrastructure.Data;
 using AStar.Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AStar.ImagesAPI.Controllers;
 
 [Route("api/image")]
 [ApiController]
-
 public class ImageController(IFileSystem fileSystem, IImageService imageService, FilesContext context, ILogger<ImageController> logger) : ControllerBase
 {
     private const int MaximumHeightAndWidthForThumbnail = 850;
@@ -36,7 +36,7 @@ public class ImageController(IFileSystem fileSystem, IImageService imageService,
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<FileStream> GetImage(string imagePath, bool thumbnail = true, int maximumSizeInPixels = 150,
+    public ActionResult<FileStream> GetImage(string imagePath, bool thumbnail = true, int maximumSizeInPixels = 850,
         bool resize = false)
     {
         logger.LogDebug("Starting retrieval for the {ImagePath} thumbnail: {Thumbnail}, maximumSizeInPixels: {MaximumSizeInPixels}", imagePath, thumbnail, maximumSizeInPixels);
@@ -56,7 +56,7 @@ public class ImageController(IFileSystem fileSystem, IImageService imageService,
         var fileInfoJb = ReadDb(directory, filename);
         if(fileInfoJb is not null)
         {
-            fileInfoJb.LastViewed = DateTime.UtcNow;
+            fileInfoJb.FileAccessDetail.LastViewed = DateTime.UtcNow;
             try
             {
                 _ = context.SaveChanges();
@@ -69,13 +69,13 @@ public class ImageController(IFileSystem fileSystem, IImageService imageService,
 
         var extensionIndex = imagePath.LastIndexOf('.') + 1;
         var extension = imagePath[extensionIndex..];
-        using var imageFromFile = imageService.GetImage(imagePath);
+        using var imageFromFile = imageService.GetImage2(imagePath, 850);
         if(thumbnail)
         {
             maximumSizeInPixels = RestrictMaximumSizeInPixels(maximumSizeInPixels);
             var dimensions = ImageDimensions(imageFromFile.Width, imageFromFile.Height, maximumSizeInPixels);
 
-            using var imageThumbnail = ResizeImage(imageFromFile, (int)dimensions.Width!, (int)dimensions.Height!);
+            using var imageThumbnail = ResizeImage(imageFromFile, dimensions.Width!, dimensions.Height!);
             var thumbnailMemoryStream = ToMemoryStream(imageThumbnail);
 
             logger.LogDebug("Returning the {ImagePath} thumbnail: {Thumbnail}, maximumSizeInPixels: {MaximumSizeInPixels}", imagePath, thumbnail, maximumSizeInPixels);
@@ -87,7 +87,7 @@ public class ImageController(IFileSystem fileSystem, IImageService imageService,
             maximumSizeInPixels = 1500;
             var dimensions = ImageDimensions(imageFromFile.Width, imageFromFile.Height, maximumSizeInPixels);
 
-            using var imageThumbnail = ResizeImage(imageFromFile, (int)dimensions.Width!, (int)dimensions.Height!);
+            using var imageThumbnail = ResizeImage(imageFromFile, dimensions.Width!, dimensions.Height!);
             var thumbnailMemoryStream = ToMemoryStream(imageThumbnail);
 
             logger.LogDebug("Returning the {ImagePath} thumbnail: {Thumbnail}, maximumSizeInPixels: {MaximumSizeInPixels}", imagePath, thumbnail, maximumSizeInPixels);
@@ -169,12 +169,12 @@ public class ImageController(IFileSystem fileSystem, IImageService imageService,
     {
         try
         {
-            return context.Files.FirstOrDefault(f => f.FileName == filename && f.DirectoryName == directory);
+            return context.Files.Include(file => file.FileAccessDetail).FirstOrDefault(f => f.FileName == filename && f.DirectoryName == directory);
         }
         catch
         {
             _ = Task.Delay(TimeSpan.FromSeconds(2));
-            return context.Files.FirstOrDefault(f => f.FileName == filename && f.DirectoryName == directory);
+            return context.Files.Include(file => file.FileAccessDetail).FirstOrDefault(f => f.FileName == filename && f.DirectoryName == directory);
         }
     }
 }

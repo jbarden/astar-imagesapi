@@ -5,8 +5,8 @@
 /// </summary>
 public class Dimensions
 {
-    private int? height;
-    private int? width;
+    private int height;
+    private int width;
 
     public int Id { get; set; }
 
@@ -16,14 +16,14 @@ public class Dimensions
     /// <exception cref="ArgumentOutOfRangeException">
     /// Thrown when the above conditions are not met.
     /// </exception>
-    public int? Height
+    public int Height
     {
         get => height;
         set =>
             height = value switch
             {
-                null or <= 0 => throw new ArgumentOutOfRangeException(nameof(Height),
-                    $"{nameof(Height)} cannot be null or negative."),
+                <= 0 => throw new ArgumentOutOfRangeException(nameof(Height),
+                    $"{nameof(Height)} cannot be negative."),
                 > 99999 => throw new ArgumentOutOfRangeException(nameof(Height),
                     $"{nameof(Height)} cannot be greater than 99999. Actual: {value}."),
                 _ => value
@@ -36,14 +36,14 @@ public class Dimensions
     /// <exception cref="ArgumentOutOfRangeException">
     /// Thrown when the above conditions are not met.
     /// </exception>
-    public int? Width
+    public int Width
     {
         get => width;
         set =>
             width = value switch
             {
-                null or <= 0 => throw new ArgumentOutOfRangeException(nameof(Width),
-                    $"{nameof(Width)} cannot be null or negative."),
+                <= 0 => throw new ArgumentOutOfRangeException(nameof(Width),
+                    $"{nameof(Width)} cannot be negative."),
                 > 99999 => throw new ArgumentOutOfRangeException(nameof(Width),
                     $"{nameof(Width)} cannot be greater than 99999. Actual: {value}."),
                 _ => value
