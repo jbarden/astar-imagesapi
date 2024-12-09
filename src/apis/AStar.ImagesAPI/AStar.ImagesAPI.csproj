@@ -32,7 +32,7 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.11.0" />
 		<PackageReference Include="System.Drawing.Common" Version="8.0.10" />
 		<PackageReference Include="System.IO.Abstractions" Version="21.0.29" />
-		<PackageReference Include="SkiaSharp" Version="2.88.8" />
+		<PackageReference Include="SkiaSharp" Version="3.116.1" />
 	</ItemGroup>
 
 </Project>
